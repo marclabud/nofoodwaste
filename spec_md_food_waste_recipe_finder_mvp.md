@@ -26,6 +26,7 @@ Das System ist:
 ```text
 ✓ Lebensmittel erfassen
 ✓ Lebensmittel speichern
+✓ Lebensmittel bearbeiten
 ✓ Verfallsprüfung
 ✓ Zutaten auswählen
 ✓ LLM-Rezeptsuche
@@ -338,6 +339,12 @@ Das LLM übernimmt:
 ✓ Rezeptfindung
 ✓ Priorisierung
 ✓ Rezeptformulierung
+
+## Modell
+- Provider: OpenAI
+- Modell: chatgpt 5.2
+- Parameter: `instant`
+- Auth: API-Key im Backend
 ```
 
 # Prompt
@@ -502,6 +509,7 @@ PostgreSQL
 ```http
 POST /ingredients
 GET /ingredients
+PUT /ingredients/:id
 DELETE /ingredients/:id
 ```
 

@@ -13,3 +13,20 @@ class IngredientCreate(IngredientBase):
 class Ingredient(IngredientBase):
     id: str
     createdAt: str  # ISO timestamp
+
+class Recipe(BaseModel):
+    title: str
+    matchScore: float
+    foodWastePriorityReason: str
+    estimatedTimeMinutes: int
+    usedIngredients: list[str]
+    missingRequiredIngredients: list[str]
+    optionalIngredients: list[str]
+    steps: list[str]
+    explanation: str
+
+class RecipeResponse(BaseModel):
+    recipes: list[Recipe]
+
+class GenerateRecipeRequest(BaseModel):
+    ingredient_ids: list[str]

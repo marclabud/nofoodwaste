@@ -56,6 +56,27 @@ export const useIngredients = () => {
     }
   }
 
+  const updateIngredient = async (id: string, ingredient: CreateIngredient) => {
+    loading.value = true
+    error.value = null
+    try {
+      const updatedIngredient = await $fetch<Ingredient>(`${apiUrl}/ingredients/${id}`, {
+        method: 'PUT',
+        body: ingredient
+      })
+      const index = ingredients.value.findIndex(i => i.id === id)
+      if (index !== -1) {
+        ingredients.value[index] = updatedIngredient
+      }
+      ingredients.value.sort((a, b) => new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime())
+    } catch (e: any) {
+      error.value = e.message || 'Failed to update ingredient'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   const getStatus = (expiresAt: string) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -77,6 +98,7 @@ export const useIngredients = () => {
     error,
     fetchIngredients,
     addIngredient,
+    updateIngredient,
     deleteIngredient,
     getStatus
   }
