@@ -46,7 +46,7 @@ def generate_recipes(ingredients: list[dict]) -> RecipeResponse:
     # umwandelt und OpenAI zwingt, sich zu 100% daran zu halten.
     #
     # response = client.beta.chat.completions.parse(
-    #     model="chatgpt-5.2",
+    #     model=os.getenv("LLM_MODEL", "gpt-4o"),
     #     messages=[
     #         {"role": "system", "content": PROMPT_SYSTEM},
     #         {"role": "user", "content": prompt_user}
