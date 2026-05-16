@@ -1,0 +1,59 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "srf-einstein",
+  "description": "Reconstructed SRF Einstein color palette",
+  "tokens": {
+    "color": {
+      "primary": {
+        "value": "#D50032",
+        "type": "color",
+        "description": "SRF brand red"
+      },
+      "background": {
+        "value": "#0F172A",
+        "type": "color",
+        "description": "Deep technical background"
+      },
+      "surface": {
+        "value": "#1F1F23",
+        "type": "color",
+        "description": "Primary dark surface"
+      },
+      "muted": {
+        "value": "#5E646E",
+        "type": "color",
+        "description": "Muted interface gray"
+      },
+      "border": {
+        "value": "#D9DDE3",
+        "type": "color",
+        "description": "Border and divider"
+      },
+      "white": {
+        "value": "#FFFFFF",
+        "type": "color",
+        "description": "Primary white"
+      },
+      "cyan": {
+        "value": "#00B5E2",
+        "type": "color",
+        "description": "Scientific accent cyan"
+      },
+      "blue": {
+        "value": "#2563EB",
+        "type": "color",
+        "description": "Interaction blue"
+      },
+      "yellow": {
+        "value": "#FFD400",
+        "type": "color",
+        "description": "Highlight yellow"
+      },
+      "orange": {
+        "value": "#FF6A00",
+        "type": "color",
+        "description": "Experimental accent orange"
+      }
+    }
+  }
+}
