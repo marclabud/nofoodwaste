@@ -60,6 +60,12 @@ daten = completion.choices[0].message.parsed
 * **Single Source of Truth:** Das Schema existiert nur einmal (in `models.py`). Es gibt keine doppelte Pflege mehr von Text-Prompts und Pydantic-Modellen.
 * **Fehlertoleranz:** Sollte die API fehlschlagen (z.B. wegen Inhaltsfiltern), wirft das SDK einen sauberen Fehler, statt das Backend mit unvollständigen JSON-Strings abstürzen zu lassen.
 
-### Negative Auswirkungen / Risiken
-* **Framework-Abhängigkeit:** Wir koppeln uns stark an die Pydantic-Integration der OpenAI Python-Bibliothek und sind an Modelle gebunden, die "Structured Outputs" unterstützen.
+### Risiken & Mitigation
+* **Framework-Abhängigkeit (Mitigiert):** Ursprünglich schien es ein Risiko, sich stark an "Structured Outputs" zu binden. Da mittlerweile aber auch Google (Gemini) und Anthropic (Claude) denselben nativen JSON-Schema-Standard (basierend auf OpenAPI 3.0) adaptiert haben, erweist sich der Pydantic-Ansatz als der zukunftssicherste Weg. 
+
+Die Pipeline sieht providerübergreifend so aus:
+`Pydantic Klasse` ➔ `Natives JSON-Schema` ➔ `OpenAI / Gemini / Anthropic`
+
+Egal zu welchem der drei großen Anbieter die Pipeline in Zukunft migriert wird – die Datenstruktur (der Core-Code) bleibt zu 100 % identisch.
+
 * **Frontend-Synchronisierung:** Die TypeScript-Interfaces im Frontend müssen weiterhin mit den Pydantic-Modellen im Backend synchronisiert werden (dies könnte künftig über Tools wie `openapi-typescript` automatisiert werden).
