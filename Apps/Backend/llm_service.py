@@ -5,22 +5,14 @@ from models import RecipeResponse
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-PROMPT_SYSTEM = """Du bist ein Rezeptassistent für Food-Waste-Reduktion.
-
-Aufgabe:
-Finde 1 bis 3 einfache Rezepte auf Basis vorhandener Lebensmittel.
-
-Regeln:
-- Nutze möglichst viele vorhandene Lebensmittel.
-- Bevorzuge Lebensmittel mit nahem Verfalldatum.
-- Nutze keine verfallenen Lebensmittel.
-- Nenne fehlende Pflichtzutaten separat.
-- Nenne optionale Zutaten separat.
-- Gib kurze Kochschritte.
-"""
+def load_system_prompt() -> str:
+    prompt_path = os.path.join(os.path.dirname(__file__), "prompts", "system_recipe_assistant.md")
+    with open(prompt_path, "r", encoding="utf-8") as file:
+        return file.read()
 
 def generate_recipes(ingredients: list[dict]) -> RecipeResponse:
     prompt_user = json.dumps({"ingredients": ingredients}, ensure_ascii=False)
+    system_prompt = load_system_prompt()
     
     # DEBUG: Gib den User-Prompt vor der Abfrage im Terminal (Uvicorn) aus
     print("\n--- DEBUG: USER PROMPT ---")
@@ -48,7 +40,7 @@ def generate_recipes(ingredients: list[dict]) -> RecipeResponse:
     # response = client.beta.chat.completions.parse(
     #     model=os.getenv("LLM_MODEL", "gpt-4o"),
     #     messages=[
-    #         {"role": "system", "content": PROMPT_SYSTEM},
+    #         {"role": "system", "content": system_prompt},
     #         {"role": "user", "content": prompt_user}
     #     ],
     #     response_format=RecipeResponse,
