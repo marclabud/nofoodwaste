@@ -1,31 +1,36 @@
 {
   "$schema": "https://design-tokens.github.io/community-group/format/",
-  "name": "srf-einstein",
-  "description": "Reconstructed SRF Einstein color palette",
+  "name": "srf-einstein-light",
+  "description": "SRF brand colors derived from card",
   "tokens": {
     "color": {
       "primary": {
-        "value": "#D50032",
+        "value": "#C61019",
         "type": "color",
         "description": "SRF brand red"
       },
       "background": {
-        "value": "#0F172A",
+        "value": "#FFFFFF",
         "type": "color",
-        "description": "Deep technical background"
+        "description": "Light page background"
       },
       "surface": {
-        "value": "#1F1F23",
+        "value": "#F9F9F9",
         "type": "color",
-        "description": "Primary dark surface"
+        "description": "Light surface background"
+      },
+      "text": {
+        "value": "#222222",
+        "type": "color",
+        "description": "Main text color"
       },
       "muted": {
-        "value": "#5E646E",
+        "value": "#555555",
         "type": "color",
-        "description": "Muted interface gray"
+        "description": "Muted subtext"
       },
       "border": {
-        "value": "#D9DDE3",
+        "value": "#E5E5E5",
         "type": "color",
         "description": "Border and divider"
       },
@@ -33,26 +38,6 @@
         "value": "#FFFFFF",
         "type": "color",
         "description": "Primary white"
-      },
-      "cyan": {
-        "value": "#00B5E2",
-        "type": "color",
-        "description": "Scientific accent cyan"
-      },
-      "blue": {
-        "value": "#2563EB",
-        "type": "color",
-        "description": "Interaction blue"
-      },
-      "yellow": {
-        "value": "#FFD400",
-        "type": "color",
-        "description": "Highlight yellow"
-      },
-      "orange": {
-        "value": "#FF6A00",
-        "type": "color",
-        "description": "Experimental accent orange"
       }
     }
   }

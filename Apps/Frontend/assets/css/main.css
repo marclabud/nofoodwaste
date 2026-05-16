@@ -1,17 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  /* SRF Einstein Brand Colors */
-  --color-primary: #D50032;
-  --color-background: #0F172A;
-  --color-surface: #1F1F23;
-  --color-muted: #5E646E;
-  --color-border: #D9DDE3;
+  /* SRF Brand Colors from Card */
+  --color-primary: #C61019;
+  --color-background: #FFFFFF;
+  --color-surface: #F9F9F9;
+  --color-text: #222222;
+  --color-muted: #555555;
+  --color-border: #E5E5E5;
   --color-white: #FFFFFF;
-  --color-cyan: #00B5E2;
-  --color-blue: #2563EB;
-  --color-yellow: #FFD400;
-  --color-orange: #FF6A00;
 
   /* Typography */
   --font-sans: "Inter", "Helvetica Neue", "Suisse Intl", sans-serif;
@@ -20,5 +17,5 @@
 
 body {
   background-color: var(--color-background);
-  color: var(--color-white);
+  color: var(--color-text);
 }
