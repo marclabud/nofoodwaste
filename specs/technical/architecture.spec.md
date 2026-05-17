@@ -3,17 +3,13 @@
 ## Systemdiagramm & Technologie
 Das System ist in ein dediziertes Frontend und Backend getrennt (Monorepo-Ansatz).
 
-### Frontend
-- **Framework:** Nuxt 4 (Vue)
-- **Styling:** Tailwind CSS v4
-
-### Backend
-- **Framework:** FastAPI (Python)
-- **Verantwortlichkeiten:**
-  - Inventar speichern (CRUD für Lebensmittel)
-  - Verfallsprüfung
-  - LLM-Aufruf an Provider (OpenAI)
-  - JSON-Validierung
+- **Frontend:** Nuxt 4 & TailwindCSS 4 (located in `Apps/Frontend`)
+- **Backend:** Python (FastAPI, located in `Apps/Backend`)
+  - **Verantwortlichkeiten:**
+    - Inventar speichern (CRUD für Lebensmittel)
+    - Verfallsprüfung
+    - **LLM Integration:** Utilizes OpenAI's **Structured Outputs** feature (via Pydantic) to ensure highly reliable, schema-validated JSON responses for recipe generation.
+- **Package Manager:** `pnpm` (Workspace setup)
 
 ## Speicherung (Datenbank)
 
