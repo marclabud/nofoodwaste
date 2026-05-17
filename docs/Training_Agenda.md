@@ -39,10 +39,10 @@ NoFoodWaste/
 Definiert die Workspaces (Monorepo-Verwaltung):
 ```json
 {
-  "name": "nofoodwaste",
+  "name": "ws-labud-informatik",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "Apps/*
   ],
   "packageManager": "pnpm@10.33.0",
   "scripts": {
