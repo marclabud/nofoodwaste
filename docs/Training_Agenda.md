@@ -4,16 +4,71 @@ Dieser Plan führt die Teilnehmer schrittweise durch den Spec-Driven-Ansatz, vom
 
 ---
 
-## Modul 1: Das Fundament & Setup
+## Modul 1A: Das Fundament (Die Spec)
 Das Ziel dieses Moduls ist es, die Basis für die reibungslose Zusammenarbeit zwischen Entwicklern und KI-Agenten zu schaffen.
 
 * **Spec-Driven Basis:** Gemeinsames Erstellen der Spezifikation als `.md` Datei (Single Source of Truth).
 * **Design & Styling Spec:** 
   * Erstellen von Tailwind-Tokens als Teil der Spezifikation (Fokus auf Farben).
   * Design-Spezifikationen anlegen: `srf-einstein.md` und `einstein-tokens.json`.
-* **Projekt-Setup (Manuell):** 
-  * Projectsetup als Monorepo.
-  * Strukturierung mit zwei `package.json` Dateien (einmal im Projekt Root, einmal im Frontend).
+
+## Modul 1B: Projekt-Setup (Monorepo)
+Nachdem die Spezifikation steht, wird das Projekt aufgesetzt. Um Frontend und Backend sauber zu trennen, wählen wir einen Monorepo-Ansatz.
+
+### Verzeichnisstruktur
+Überblick über die geplante Architektur:
+
+```text
+NoFoodWaste/
+├── package.json           # Root Konfiguration (pnpm workspaces)
+├── spec.md                # Die Spezifikation
+├── docs/                  # Dokumentation & Design Tokens
+│   ├── srf-einstein.md
+│   └── einstein-tokens.json
+└── Apps/
+    ├── Frontend/          # Nuxt 4 Projekt
+    │   └── package.json
+    └── Backend/           # Python FastAPI Projekt
+        ├── main.py
+        └── requirements.txt
+```
+
+### Konfigurationsdateien
+
+**1. Projekt Root (`/package.json`)**
+Definiert die Workspaces (Monorepo-Verwaltung):
+```json
+{
+  "name": "nofoodwaste",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build"
+  }
+}
+```
+
+**2. Frontend (`/Apps/Frontend/package.json`)**
+Das eigentliche Frontend-Projekt (vereinfachter Auszug für die Schulung):
+```json
+{
+  "name": "frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.2.1",
+    "nuxt": "^4.2.2"
+  }
+}
+```
 
 ## Modul 2: Vertikale Feature-Entwicklung (CRUD)
 In diesem Modul setzen wir die ersten Kernfunktionen der Spec von der Datenbank bis zur Benutzeroberfläche um.

@@ -1,5 +1,5 @@
 {
-  "name": "ws-labud-informatik",
+  "name": "nofoodwaste",
   "private": true,
   "workspaces": [
     "apps/*"
