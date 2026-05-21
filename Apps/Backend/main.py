@@ -114,7 +114,7 @@ from llm_service import generate_recipes
 from models import RecipeResponse, GenerateRecipeRequest
 
 @app.post("/recipes/generate", response_model=RecipeResponse)
-def generate_recipes_endpoint(request: GenerateRecipeRequest):
+async def generate_recipes_endpoint(request: GenerateRecipeRequest):
     with get_db() as conn:
         cursor = conn.cursor()
         
@@ -148,7 +148,7 @@ def generate_recipes_endpoint(request: GenerateRecipeRequest):
             
         # Call LLM
         try:
-            recipes = generate_recipes(valid_ingredients)
+            recipes = await generate_recipes(valid_ingredients)
             return recipes
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"LLM Error: {str(e)}")
