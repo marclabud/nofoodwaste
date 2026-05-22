@@ -1,0 +1,12 @@
+.git
+.github
+node_modules/
+Apps/Frontend/node_modules/
+Apps/Frontend/.nuxt/
+Apps/Frontend/.output/
+Apps/Backend/.venv/
+dist/
+.DS_Store
+*.db
+.vscode/
+pnpm-debug.log

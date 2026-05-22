@@ -21,10 +21,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for the Frontend (Nuxt)
+# Enable CORS for the Frontend
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

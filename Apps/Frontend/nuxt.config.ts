@@ -12,4 +12,14 @@ export default defineNuxtConfig({
       '@tailwindcss/postcss': {},
     },
   },
+  runtimeConfig: {
+    public: {
+      apiBase: '/api'
+    }
+  },
+  site: {
+    url: 'http://localhost:3000',
+    name: 'No Food Waste'
+  }
 })
+

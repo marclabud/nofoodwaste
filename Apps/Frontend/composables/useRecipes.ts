@@ -2,7 +2,7 @@ import type { Recipe } from '~/types'
 
 export const useRecipes = () => {
   const config = useRuntimeConfig()
-  const apiUrl = 'http://localhost:8000'
+  const apiUrl = config.public.apiBase || '/api'
   
   const recipes = useState<Recipe[]>('recipes', () => [])
   const loading = useState<boolean>('recipes-loading', () => false)

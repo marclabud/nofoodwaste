@@ -2,7 +2,7 @@ import type { Ingredient, CreateIngredient } from '~/types'
 
 export const useIngredients = () => {
   const config = useRuntimeConfig()
-  const apiUrl = 'http://localhost:8000' // Hardcoded for MVP, ideally should be config.public.apiBase
+  const apiUrl = config.public.apiBase || '/api'
   
   const ingredients = useState<Ingredient[]>('ingredients', () => [])
   const loading = useState<boolean>('ingredients-loading', () => false)

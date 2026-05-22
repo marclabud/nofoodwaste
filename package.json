@@ -1,15 +1,17 @@
 {
   "name": "nofoodwaste",
   "private": true,
-  "workspaces": [
-    "apps/*"
-  ],
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "pnpm -r dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "podman:build": "bash ./run-podman.sh build",
+    "podman:up": "bash ./run-podman.sh up",
+    "podman:down": "bash ./run-podman.sh down",
+    "podman:status": "bash ./run-podman.sh status",
+    "podman:logs": "bash ./run-podman.sh logs"
   },
   "engines": {
     "node": ">=24",
