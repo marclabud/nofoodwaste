@@ -48,7 +48,15 @@ async def generate_recipes(ingredients: list[dict]) -> RecipeResponse:
             
         # Parse the structured JSON response into our Pydantic model
         try:
-            return RecipeResponse.model_validate_json(final_text)
+            recipe_response = RecipeResponse.model_validate_json(final_text)
+            
+            # Normalize matchScore for each recipe
+            for recipe in recipe_response.recipes:
+                if recipe.matchScore > 1.0:
+                    recipe.matchScore = recipe.matchScore / 100.0
+                recipe.matchScore = min(max(recipe.matchScore, 0.0), 1.0)
+                
+            return recipe_response
         except Exception as parse_error:
             print(f"Validation failed for Cook Agent output: {parse_error}")
             print(f"Raw Output: {final_text}")

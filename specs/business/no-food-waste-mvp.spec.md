@@ -7,8 +7,8 @@ Ein Benutzer verwaltet vorhandene Lebensmittel mit Mengen und Verfalldaten.
 Das System:
 - speichert Lebensmittel,
 - verhindert die Nutzung verfallener Lebensmittel,
-- sendet gültige Lebensmittel an ein LLM,
-- erhält 1–3 Rezeptvorschläge,
+- sendet gültige Lebensmittel an einen intelligenten Rezept-Agenten (Google ADK 2.0 / Gemini 2.5 Flash),
+- erhält 1–3 strukturierte, typensichere Rezeptvorschläge,
 - zeigt diese in einer klaren Food-Waste-orientierten Oberfläche an.
 
 Das System ist:
@@ -26,7 +26,7 @@ Das System ist:
 ✓ Lebensmittel bearbeiten
 ✓ Verfallsprüfung
 ✓ Zutaten auswählen
-✓ LLM-Rezeptsuche
+✓ Agentengestützte Rezeptgenerierung (Google ADK 2.0)
 ✓ Rezeptanzeige
 ✓ Food-Waste-Hinweise
 ```
@@ -51,8 +51,8 @@ Das System ist:
 2. Lebensmittel speichern
 3. Verfallene Lebensmittel werden deaktiviert
 4. Benutzer wählt Zutaten
-5. Zutaten werden an LLM gesendet
-6. LLM liefert 1–3 Rezepte
+5. Zutaten werden an den Rezept-Agenten gesendet
+6. Der Agent liefert 1–3 strukturierte Rezepte zurück
 7. Rezepte werden als Karten angezeigt
 ```
 
@@ -74,7 +74,7 @@ type Ingredient = {
 ```ts
 type Recipe = {
   title: string
-  matchScore: number
+  matchScore: number // Dezimalwert zwischen 0.0 und 1.0 (wird im Backend auf dieses Intervall normalisiert)
   foodWastePriorityReason: string
   estimatedTimeMinutes: number
   usedIngredients: string[]
@@ -84,6 +84,20 @@ type Recipe = {
   explanation: string
 }
 ```
+
+## Geschäftsregeln: Agenten-Verhalten & Match-Score
+
+### Berechnung des Match-Scores
+Der Match-Score wird nicht über eine starre mathematische Formel berechnet, sondern vom Rezept-Agenten (Gemini 2.5 Flash) semantisch geschätzt. Dabei gelten folgende Kriterien:
+1. **Zutaten-Abdeckung:** Verhältnis zwischen den vom Benutzer bereitgestellten (verwendeten) Zutaten und den zusätzlich benötigten Pflichtzutaten.
+2. **Food-Waste-Priorisierung:** Ein Bonus fließt in den Score ein, wenn Zutaten mit sehr nahem Verfallsdatum vollständig verwertet werden.
+3. **Normalisierung:** Der Score wird im Backend robust validiert und auf einen Wert zwischen `0.0` und `1.0` normalisiert (z. B. `0.95` für 95% Match), damit das Frontend ihn verlässlich rendern kann.
+
+### Prompt-Security & Leitplanken des Agenten
+Der Rezept-Agent (`cook_agent`) ist durch ein strukturiertes System-Prompt (`system_recipe_assistant.md`) abgesichert:
+* **Themenfokus:** Er beantwortet ausschließlich Anfragen im Kontext von Kochen, Rezepten und Lebensmitteln.
+* **Jailbreak-Schutz:** Systemanweisungen können nicht durch Benutzereingaben überschrieben werden.
+* **Schadcode-Schutz:** Bei unsinnigen, schädlichen oder themenfremden Eingaben führt der Agent keine Aktionen aus und liefert ein leeres Rezept-Array zurück.
 
 ## Geschäftsregeln: Verfallslogik
 

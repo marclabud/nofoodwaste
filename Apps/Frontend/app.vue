@@ -26,7 +26,7 @@ const handleGenerateRecipes = () => {
   <div class="min-h-screen bg-background text-text font-sans pb-12">
     <main class="container mx-auto p-4 max-w-lg">
       <header class="mb-8 mt-4">
-        <h1 class="text-3xl font-bold text-primary mb-2">Food-Waste MVP</h1>
+        <h1 class="text-3xl font-bold text-primary mb-2">No Food-Waste MVP</h1>
         <p class="text-muted text-sm">Verwalte deine Lebensmittel und finde Rezepte.</p>
       </header>
 

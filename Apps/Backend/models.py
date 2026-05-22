@@ -16,7 +16,10 @@ class Ingredient(IngredientBase):
 
 class Recipe(BaseModel):
     title: str
-    matchScore: float
+    matchScore: float = Field(
+        ...,
+        description="The match score of the recipe, representing how well the recipe fits the user's available ingredients and food waste priorities. Must be a decimal between 0.0 and 1.0 (e.g., 0.95 for 95%)."
+    )
     foodWastePriorityReason: str
     estimatedTimeMinutes: int
     usedIngredients: list[str]

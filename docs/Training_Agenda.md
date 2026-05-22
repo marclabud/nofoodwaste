@@ -79,13 +79,15 @@ In diesem Modul setzen wir die ersten Kernfunktionen der Spec von der Datenbank 
 * **Schritt 2: Lebensmittel ändern**
   * Iteratives Erweitern der bestehenden Logik (z. B. Verfallslogik anpassen).
 
-## Modul 3: LLM-Integration (KI als Feature)
-Hier integrieren wir die eigentliche "Intelligenz" der Applikation und lernen, wie LLMs sicher und strukturiert in eine klassische Architektur eingebettet werden.
+## Modul 3: Agenten- & LLM-Integration (KI als intelligenter Agent)
+Hier integrieren wir die eigentliche "Intelligenz" der Applikation und lernen, wie autonome KI-Agenten sicher, strukturiert und typensicher in eine moderne Anwendungsarchitektur eingebettet werden.
 
-* **Schritt 3: LLM-Abfrage auf Rezepte einbauen**
-  * Backend-Logik für die OpenAI-Anbindung.
-  * Prompts auslagern und härten (Prompt Security).
-  * *Schema over Prompt:* Nutzung von Pydantic und Structured Outputs, um valides JSON für die Rezepte zu erzwingen.
+* **Schritt 3: Rezept-Agenten mit Google ADK 2.0 einbauen**
+  * **Agenten-Setup:** Definition des `cook_agent` unter Verwendung des **Google ADK 2.0** (Agent Development Kit) und Gemini 2.5 Flash.
+  * **Isolierte Ausführung:** Nutzung des `InMemoryRunner` zur sicheren Steuerung der Agenten-Ausführung im Backend.
+  * **System-Prompts & Prompt-Security:** Auslagern und Härten der System-Anweisungen (`prompts/system_recipe_assistant.md`) zum Schutz vor Prompt-Injection, Jailbreaks und zur Einhaltung von Systemgrenzen.
+  * **Schema-over-Prompt:** Übergabe von Pydantic-Modellen (`RecipeResponse`) als `output_schema` an den Agenten, um native Structured Outputs und 100% typensichere JSON-Antworten zu erzwingen.
+  * **Datenbereinigung & Postprocessing:** Implementierung robuster Python-seitiger Nachbearbeitung (z. B. der `matchScore`-Normalisierung), um Abweichungen des LLMs abzufangen und Datenqualitätsansprüche zu garantieren.
 
 ## Modul 4: Frontend Vollendung
 Zum Abschluss wird das Ergebnis der KI im Frontend nutzbar gemacht.
