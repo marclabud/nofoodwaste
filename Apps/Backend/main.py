@@ -6,14 +6,15 @@ import uuid
 from datetime import datetime, timezone
 from typing import List
 
-from database import init_db, get_db
-from models import Ingredient, IngredientCreate
-
 # Load environment variables from .env
 load_dotenv()
 
-# Initialize Database
-init_db()
+from database import get_db_provider
+from models import Ingredient, IngredientCreate
+
+# Initialize Database Provider
+db_provider = get_db_provider()
+db_provider.init_db()
 
 app = FastAPI(
     title="Food-Waste Recipe Finder API",
@@ -48,110 +49,60 @@ def create_ingredient(ingredient_in: IngredientCreate):
         **ingredient_in.model_dump()
     )
     
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            '''
-            INSERT INTO ingredients (id, name, quantity, unit, expiresAt, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ''',
-            (ingredient.id, ingredient.name, ingredient.quantity, ingredient.unit, ingredient.expiresAt, ingredient.createdAt)
-        )
-        conn.commit()
-        
+    db_provider.create_ingredient(ingredient)
     return ingredient
 
 @app.get("/ingredients", response_model=List[Ingredient])
 def get_ingredients():
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM ingredients ORDER BY expiresAt ASC')
-        rows = cursor.fetchall()
-        
-    return [Ingredient(**dict(row)) for row in rows]
+    return db_provider.get_ingredients()
 
 @app.delete("/ingredients/{ingredient_id}")
 def delete_ingredient(ingredient_id: str):
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM ingredients WHERE id = ?', (ingredient_id,))
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Ingredient not found")
-        conn.commit()
-        
+    deleted = db_provider.delete_ingredient(ingredient_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
     return {"message": "Ingredient deleted"}
 
 @app.put("/ingredients/{ingredient_id}", response_model=Ingredient)
 def update_ingredient(ingredient_id: str, ingredient_in: IngredientCreate):
-    with get_db() as conn:
-        cursor = conn.cursor()
+    # Retrieve the existing ingredient first to preserve its createdAt timestamp
+    existing_ingredients = db_provider.get_ingredients_by_ids([ingredient_id])
+    if not existing_ingredients:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
         
-        # Check if exists to get createdAt
-        cursor.execute('SELECT * FROM ingredients WHERE id = ?', (ingredient_id,))
-        row = cursor.fetchone()
-        
-        if not row:
-            raise HTTPException(status_code=404, detail="Ingredient not found")
-            
-        created_at = dict(row)['createdAt']
-        
-        ingredient = Ingredient(
-            id=ingredient_id,
-            createdAt=created_at,
-            **ingredient_in.model_dump()
-        )
-        
-        cursor.execute(
-            '''
-            UPDATE ingredients 
-            SET name = ?, quantity = ?, unit = ?, expiresAt = ?
-            WHERE id = ?
-            ''',
-            (ingredient.name, ingredient.quantity, ingredient.unit, ingredient.expiresAt, ingredient_id)
-        )
-        conn.commit()
-        
-    return ingredient
+    created_at = existing_ingredients[0].createdAt
+    
+    return db_provider.update_ingredient(ingredient_id, ingredient_in, created_at)
 
 from llm_service import generate_recipes
 from models import RecipeResponse, GenerateRecipeRequest
 
 @app.post("/recipes/generate", response_model=RecipeResponse)
 async def generate_recipes_endpoint(request: GenerateRecipeRequest):
-    with get_db() as conn:
-        cursor = conn.cursor()
+    ingredients = db_provider.get_ingredients_by_ids(request.ingredient_ids)
+    
+    if not ingredients:
+        raise HTTPException(status_code=400, detail="No valid ingredients found")
         
-        # Build query for specific ingredients
-        placeholders = ','.join('?' for _ in request.ingredient_ids)
-        query = f'SELECT * FROM ingredients WHERE id IN ({placeholders})'
-        
-        cursor.execute(query, request.ingredient_ids)
-        rows = cursor.fetchall()
-        
-        ingredients = [dict(row) for row in rows]
-        
-        if not ingredients:
-            raise HTTPException(status_code=400, detail="No valid ingredients found")
+    # Filter out expired ingredients just in case frontend sends them
+    valid_ingredients = []
+    today = datetime.now().strftime("%Y-%m-%d")
+    for ing in ingredients:
+        if ing.expiresAt >= today:
+            # Omit createdAt and id to save tokens
+            valid_ingredients.append({
+                "name": ing.name,
+                "quantity": ing.quantity,
+                "unit": ing.unit,
+                "expiresAt": ing.expiresAt
+            })
             
-        # Filter out expired ingredients just in case frontend sends them
-        valid_ingredients = []
-        today = datetime.now().strftime("%Y-%m-%d")
-        for ing in ingredients:
-            if ing['expiresAt'] >= today:
-                # Omit createdAt and id to save tokens
-                valid_ingredients.append({
-                    "name": ing["name"],
-                    "quantity": ing["quantity"],
-                    "unit": ing["unit"],
-                    "expiresAt": ing["expiresAt"]
-                })
-                
-        if not valid_ingredients:
-            raise HTTPException(status_code=400, detail="No non-expired ingredients found")
-            
-        # Call LLM
-        try:
-            recipes = await generate_recipes(valid_ingredients)
-            return recipes
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"LLM Error: {str(e)}")
+    if not valid_ingredients:
+        raise HTTPException(status_code=400, detail="No non-expired ingredients found")
+        
+    # Call LLM
+    try:
+        recipes = await generate_recipes(valid_ingredients)
+        return recipes
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM Error: {str(e)}")
