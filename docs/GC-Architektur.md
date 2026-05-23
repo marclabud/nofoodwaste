@@ -10,35 +10,35 @@ Das folgende Diagramm veranschaulicht den Datenfluss und die Interaktion der ein
 
 ```mermaid
 graph TD
-    User([Endbenutzer / Browser])
+    User["Endbenutzer / Browser"]
     
-    subgraph Google Cloud & Firebase (GCP Project)
-        subgraph Präsentationsschicht
-            FH["Firebase Hosting <br> (Globales CDN / Nuxt Statische Assets)"]
+    subgraph "Google Cloud & Firebase (GCP Project)"
+        subgraph "Präsentationsschicht"
+            FH["Firebase Hosting (Globales CDN / Nuxt Statische Assets)"]
         end
         
-        subgraph Logikschicht
-            CR["Google Cloud Run <br> (FastAPI Python App in Docker)"]
-            SM["GCP Secret Manager <br> (Verschlüsselter Gemini API-Key)"]
-            SA["Service Account <br> (Minimale Berechtigungen / IAM)"]
+        subgraph "Logikschicht"
+            CR["Google Cloud Run (FastAPI Python App in Docker)"]
+            SM["GCP Secret Manager (Verschlüsselter Gemini API-Key)"]
+            SA["Service Account (Minimale Berechtigungen / IAM)"]
         end
         
-        subgraph Datenschicht
-            CF["Cloud Firestore <br> (Serverlose NoSQL Datenbank)"]
+        subgraph "Datenschicht"
+            CF["Cloud Firestore (Serverlose NoSQL Datenbank)"]
         end
     end
     
-    subgraph Externe Dienste
-        Gemini["Google AI Studio <br> (Gemini LLM API)"]
+    subgraph "Externe Dienste"
+        Gemini["Google AI Studio (Gemini LLM API)"]
     end
     
     %% Datenflüsse und Interaktionen
-    User -->|1. Lädt HTML/JS/CSS| FH
-    User -->|2. API-Anfragen / REST| CR
-    CR -.->|Nimmt Identität an| SA
-    CR -->|3. Liest Key zur Laufzeit| SM
-    CR -->|4. Speichert/Liest Zutaten| CF
-    CR -->|5. Generiert Rezepte| Gemini
+    User -->| "1. Lädt HTML/JS/CSS" | FH
+    User -->| "2. API-Anfragen / REST" | CR
+    CR -.->| "Nimmt Identität an" | SA
+    CR -->| "3. Liest Key zur Laufzeit" | SM
+    CR -->| "4. Speichert/Liest Zutaten" | CF
+    CR -->| "5. Generiert Rezepte" | Gemini
 ```
 
 ---
