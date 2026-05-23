@@ -62,6 +62,7 @@ Locate the `.env` file in the backend directory. Open it in your favorite editor
 
 ```env
 # API Keys for LLM Integration
+# Obtain your Gemini API key from Google AI Studio: https://aistudio.google.com/
 OPENAI_API_KEY=your_openai_api_key_here
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE   # <-- Replace this with your actual Gemini API Key!
 

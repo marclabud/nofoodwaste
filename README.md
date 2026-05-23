@@ -31,7 +31,7 @@ This project is structured as a monorepo containing both the frontend and backen
 - [Node.js](https://nodejs.org/) (v24 or higher)
 - [pnpm](https://pnpm.io/) (v10 or higher)
 - Python 3.x (for the backend)
-- An active LLM API Key (e.g., OpenAI)
+- An active LLM API Key (e.g., Gemini API key from [Google AI Studio](https://aistudio.google.com/) or OpenAI)
 
 ### Installation
 
