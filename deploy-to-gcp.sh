@@ -255,6 +255,18 @@ EOF
     cd ../..
     echo -e "${GREEN}[✔] Frontend successfully deployed to Firebase Hosting!${NC}"
     
+    # Secure CORS configuration: Update backend env vars with the actual Firebase domains
+    echo -e "\n${BLUE}Restricting Backend CORS ALLOWED_ORIGINS to Firebase Hosting domains...${NC}"
+    FRONTEND_URL="https://$PROJECT_ID.web.app,https://$PROJECT_ID.firebaseapp.com"
+    echo -e "Target Origins: ${YELLOW}$FRONTEND_URL${NC}"
+    if gcloud run services update nofoodwaste-backend \
+        --region="$REGION" \
+        --update-env-vars="ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
+        echo -e "${GREEN}[✔] Backend CORS successfully restricted to production domains.${NC}"
+    else
+        echo -e "${RED}[✘] Warning: Failed to update Backend CORS settings. ALLOWED_ORIGINS remains '*'.${NC}"
+    fi
+    
 elif [[ $REPLY_FRONTEND == "2" ]]; then
     FRONTEND_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/frontend:latest"
     echo -e "${BLUE}Building Frontend Container with API URL for linux/amd64...${NC}"
@@ -276,8 +288,22 @@ elif [[ $REPLY_FRONTEND == "2" ]]; then
         
     FRONTEND_URL=$(gcloud run services describe nofoodwaste-frontend --region="$REGION" --format='value(status.url)')
     echo -e "${GREEN}[✔] Frontend deployed successfully to Cloud Run at: ${YELLOW}$FRONTEND_URL${NC}"
+    
+    # Secure CORS configuration: Update backend env vars with the actual Cloud Run frontend URL
+    echo -e "\n${BLUE}Restricting Backend CORS ALLOWED_ORIGINS to Cloud Run Frontend URL...${NC}"
+    echo -e "Target Origin: ${YELLOW}$FRONTEND_URL${NC}"
+    if gcloud run services update nofoodwaste-backend \
+        --region="$REGION" \
+        --update-env-vars="ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
+        echo -e "${GREEN}[✔] Backend CORS successfully restricted to production domains.${NC}"
+    else
+        echo -e "${RED}[✘] Warning: Failed to update Backend CORS settings. ALLOWED_ORIGINS remains '*'.${NC}"
+    fi
 else
     echo -e "${YELLOW}Skipped Frontend Deployment. You can deploy it manually later!${NC}"
+    echo -e "${YELLOW}[!] Note: Backend ALLOWED_ORIGINS is currently set to '*' (open to all).${NC}"
+    echo -e "${YELLOW}    Once deployed, update it securely using:${NC}"
+    echo -e "${YELLOW}    gcloud run services update nofoodwaste-backend --region=\"$REGION\" --update-env-vars=\"ALLOWED_ORIGINS=https://[your-frontend-url]\"${NC}"
 fi
 
 echo -e "\n${GREEN}====================================================${NC}"

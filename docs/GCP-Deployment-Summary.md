@@ -22,7 +22,7 @@ During our migration from a local SQLite/Podman environment to a stateless Googl
 
 ### Challenge 4: CORS (Cross-Origin Resource Sharing) Blockage in Production
 *   **The Problem:** The FastAPI backend initially only permitted requests from `http://localhost:3000`. Once the frontend went live at `https://[project-id].web.app`, the browser blocked all JavaScript fetches to the Cloud Run API with `<no response> Failed to fetch`.
-*   **The Solution:** Added the `ALLOWED_ORIGINS=*` environment variable to the Cloud Run backend settings, permitting the live frontend to safely communicate with the API.
+*   **The Solution:** Resolved by setting up dynamic, secure production CORS rules. The deployment script boots the backend with a wildcard `*` to ensure initial accessibility, but automatically restricts `ALLOWED_ORIGINS` via `gcloud run services update` to the exact deployed frontend URLs (e.g., your custom Firebase domains or frontend Cloud Run service URL) immediately after the frontend goes live.
 
 ### Challenge 5: Cloud Billing "Catch-22"
 *   **The Problem:** Advanced services like Artifact Registry and Cloud Run require an active Billing Account. Trying to link billing via the CLI failed because the *Cloud Billing API* itself was disabled on the new project (a classic GCP Catch-22).
