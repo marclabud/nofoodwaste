@@ -23,21 +23,21 @@ const handleGenerateRecipes = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-text font-sans pb-12">
+  <div class="min-h-screen bg-background text-text font-sans pb-16">
     <main class="container mx-auto p-4 max-w-lg">
-      <header class="mb-8 mt-4">
-        <h1 class="text-3xl font-bold text-primary mb-2">No Food-Waste MVP</h1>
-        <p class="text-muted text-sm">Verwalte deine Lebensmittel und finde Rezepte.</p>
+      <header class="mb-8 mt-6">
+        <h1 class="text-4xl font-extrabold text-text text-center tracking-tight mb-1">NoFoodWaste</h1>
+        <p class="text-muted text-center text-sm font-medium">Dein intelligenter Küchenassistent</p>
       </header>
 
-      <section class="mb-8">
-        <h2 class="text-2xl font-bold mb-4 border-b border-border/20 pb-2">Meine Lebensmittel</h2>
+      <section class="mb-10">
+        <h2 class="text-xl font-bold text-text mb-4">Meine Lebensmittel</h2>
         
-        <div v-if="ingredientsLoading && ingredients.length === 0" class="text-muted py-4 text-center">
+        <div v-if="ingredientsLoading && ingredients.length === 0" class="text-muted py-6 text-center text-sm">
           Lade Lebensmittel...
         </div>
         
-        <div v-else-if="ingredientsError" class="bg-primary/20 text-primary p-4 rounded mb-4">
+        <div v-else-if="ingredientsError" class="bg-primary/10 border border-primary/20 text-primary p-4 rounded-xl mb-4 text-sm">
           {{ ingredientsError }}
         </div>
         
@@ -47,7 +47,7 @@ const handleGenerateRecipes = () => {
             :key="item.id" 
             :ingredient="item" 
           />
-          <div v-if="ingredients.length === 0" class="text-center py-6 text-muted border border-dashed border-border/30 rounded-lg">
+          <div v-if="ingredients.length === 0" class="text-center py-8 text-sm text-muted bg-white border border-dashed border-border/60 rounded-2xl shadow-sm">
             Keine Lebensmittel vorhanden. Füge welche hinzu!
           </div>
         </div>
@@ -56,20 +56,29 @@ const handleGenerateRecipes = () => {
       </section>
 
       <section class="mb-8">
-        <h2 class="text-2xl font-bold mb-4 border-b border-border/20 pb-2">Rezeptvorschläge finden</h2>
+        <h2 class="text-xl font-bold text-text mb-4">Rezeptvorschläge</h2>
         
         <div class="mb-6">
           <button 
             @click="handleGenerateRecipes" 
             :disabled="recipesLoading || validIngredients.length === 0"
-            class="w-full bg-text text-white font-semibold py-3 px-4 rounded-lg hover:bg-text/90 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+            class="w-full bg-primary hover:bg-primary/95 text-white font-semibold py-3.5 px-4 rounded-xl shadow-sm transition-all duration-200 disabled:opacity-40 disabled:shadow-none flex justify-center items-center gap-2 cursor-pointer"
           >
-            <span v-if="recipesLoading">Generiere Rezepte...</span>
-            <span v-else>Ideen finden ({{ validIngredients.length }} Zutaten)</span>
+            <span v-if="recipesLoading" class="flex items-center gap-2 justify-center">
+              <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Generiere Rezepte...
+            </span>
+            <span v-else class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Ideen finden ({{ validIngredients.length }} Zutaten)
+            </span>
           </button>
         </div>
 
-        <div v-if="recipesError" class="bg-primary/20 text-primary p-4 rounded mb-4">
+        <div v-if="recipesError" class="bg-primary/10 border border-primary/20 text-primary p-4 rounded-xl mb-4 text-sm">
           {{ recipesError }}
         </div>
 
