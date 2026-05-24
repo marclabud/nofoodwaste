@@ -35,6 +35,7 @@ detect_container_engine() {
     echo -e "${BLUE}====================================================${NC}"
     echo -e "${BLUE}   NoFoodWaste - Google Cloud Deployer Script       ${NC}"
     echo -e "${BLUE}====================================================${NC}"
+    echo -e "${BLUE}[Step 1/10] Detecting Container Engine...${NC}"
 
     if command -v podman &> /dev/null; then
         CONTAINER_CMD="podman"
@@ -70,6 +71,7 @@ detect_container_engine() {
 # Step 2: Check GCP CLI and Project
 # ====================================================
 check_gcp_cli_and_project() {
+    echo -e "\n${BLUE}[Step 2/10] Checking GCP CLI and Active Project...${NC}"
     if ! command -v gcloud &> /dev/null; then
         echo -e "${RED}[✘] Error: Google Cloud SDK (gcloud) is not installed.${NC}"
         echo -e "    Please run: brew install --cask google-cloud-sdk"
@@ -93,6 +95,7 @@ check_gcp_cli_and_project() {
 # Step 3: Load Gemini API Key
 # ====================================================
 load_gemini_api_key() {
+    echo -e "\n${BLUE}[Step 3/10] Loading Gemini API Key...${NC}"
     if [ -f "$ENV_FILE" ]; then
         # Extracts value for GEMINI_API_KEY from the local environment file (wrapped to avoid pipefail crash if unset)
         GEMINI_API_KEY=$( (grep -E "^GEMINI_API_KEY=" "$ENV_FILE" || true) | cut -d'=' -f2-)
@@ -111,7 +114,8 @@ load_gemini_api_key() {
 # Step 4: Early Frontend Options & Validation
 # ====================================================
 select_frontend_option_and_validate() {
-    echo -e "\n${BLUE}--- Summary of Configurations ---${NC}"
+    echo -e "\n${BLUE}[Step 4/10] Early Frontend Options & Validation...${NC}"
+    echo -e "${BLUE}--- Summary of Configurations ---${NC}"
     echo -e "Project ID:       ${YELLOW}$PROJECT_ID${NC}"
     echo -e "Region:           ${YELLOW}$REGION${NC}"
     echo -e "Container Runner: ${YELLOW}$CONTAINER_CMD${NC}"
@@ -157,7 +161,7 @@ select_frontend_option_and_validate() {
 # Step 5: Enable Required GCP APIs
 # ====================================================
 enable_gcp_apis() {
-    echo -e "\n${BLUE}Enabling required Google Cloud APIs (this may take a minute)...${NC}"
+    echo -e "\n${BLUE}[Step 5/10] Enabling Required GCP APIs (this may take a minute)...${NC}"
     gcloud services enable \
         run.googleapis.com \
         artifactregistry.googleapis.com \
@@ -171,7 +175,7 @@ enable_gcp_apis() {
 # Step 6: Configure Secret Manager
 # ====================================================
 setup_secret_manager() {
-    echo -e "\n${BLUE}[Step 4/8] Configuring Google Cloud Secret Manager...${NC}"
+    echo -e "\n${BLUE}[Step 6/10] Configuring Google Cloud Secret Manager...${NC}"
     if gcloud secrets describe gemini-api-key &>/dev/null; then
         echo -e "${GREEN}[✔] Secret 'gemini-api-key' already exists. Adding new version...${NC}"
         echo -n "$GEMINI_API_KEY" | gcloud secrets versions add gemini-api-key --data-file=-
@@ -186,7 +190,7 @@ setup_secret_manager() {
 # Step 7: Artifact Registry & Build Backend Image
 # ====================================================
 build_and_push_backend() {
-    echo -e "\n${BLUE}[Step 5/8] Preparing Artifact Registry & Container Build...${NC}"
+    echo -e "\n${BLUE}[Step 7/10] Preparing Artifact Registry & Container Build...${NC}"
     if ! gcloud artifacts repositories describe "$REPO_NAME" --location="$REGION" &>/dev/null; then
         echo -e "${YELLOW}[!] Creating Docker repository '$REPO_NAME' in region '$REGION'...${NC}"
         gcloud artifacts repositories create "$REPO_NAME" \
@@ -213,7 +217,7 @@ build_and_push_backend() {
 # Step 8: Configure Secure IAM Service Account
 # ====================================================
 setup_service_account() {
-    echo -e "\n${BLUE}[Step 6/8] Configuring Secure Service Account...${NC}"
+    echo -e "\n${BLUE}[Step 8/10] Configuring Secure Service Account...${NC}"
     SA_EMAIL="$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"
 
     if ! gcloud iam service-accounts describe "$SA_EMAIL" &>/dev/null; then
@@ -242,7 +246,7 @@ setup_service_account() {
 # Step 9: Deploy Backend to Google Cloud Run
 # ====================================================
 deploy_backend_api() {
-    echo -e "\n${BLUE}[Step 7/8] Deploying Backend API to Google Cloud Run...${NC}"
+    echo -e "\n${BLUE}[Step 9/10] Deploying Backend API to Google Cloud Run...${NC}"
     gcloud run deploy nofoodwaste-backend \
         --image="$BACKEND_IMAGE" \
         --region="$REGION" \
@@ -262,7 +266,7 @@ deploy_backend_api() {
 # Step 10: Deploy Frontend (Based on Option)
 # ====================================================
 deploy_frontend() {
-    echo -e "\n${BLUE}[Step 8/8] Frontend Deployment...${NC}"
+    echo -e "\n${BLUE}[Step 10/10] Frontend Deployment...${NC}"
 
     if [[ $REPLY_FRONTEND == "1" ]]; then
         echo -e "${BLUE}Deploying Frontend to Firebase Hosting...${NC}"
