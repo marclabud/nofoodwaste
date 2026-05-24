@@ -86,7 +86,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: pnpm@10.33.0
+          version: 10.33.0
 
       # 2. Frontend-Abhängigkeiten installieren & statische Seite generieren
       - name: Build Frontend
