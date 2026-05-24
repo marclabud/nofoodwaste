@@ -84,3 +84,17 @@ Ein wesentlicher Teil dieser Cloud-Architektur ist das Sicherheitskonzept, das a
    Selbst wenn ein Angreifer eine Schwachstelle im Backend ausnutzen würde, hätte er keinen Zugriff auf andere Google Cloud-Ressourcen oder Ihr Abrechnungskonto.
 3. **Kapselung der LLM-API:**
    Der Benutzer-Browser kommuniziert niemals direkt mit der Gemini API. Das Backend fungiert als sicheres Gateway. Dadurch bleibt Ihr Gemini API-Key für die Außenwelt absolut unsichtbar.
+
+---
+
+## 4. Live-Endpunkte & URLs
+
+Die produktive Anwendung ist auf der Google Cloud Platform und Firebase unter den folgenden Adressen live geschaltet und voll funktionsfähig:
+
+### 🌐 Frontend (Firebase Hosting)
+* **Haupt-URL (Projekt-Standard):** [https://my-first-project-9510f.web.app](https://my-first-project-9510f.web.app)
+* **Alternative Firebase-Domain:** [https://my-first-project-9510f.firebaseapp.com](https://my-first-project-9510f.firebaseapp.com)
+
+### ⚙️ Backend (Google Cloud Run API)
+* **Backend Service URL:** [https://nofoodwaste-backend-301426404374.europe-west6.run.app](https://nofoodwaste-backend-301426404374.europe-west6.run.app)
+* **API Swagger-Dokumentation (interaktiv):** [https://nofoodwaste-backend-301426404374.europe-west6.run.app/docs](https://nofoodwaste-backend-301426404374.europe-west6.run.app/docs)
