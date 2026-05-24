@@ -17,6 +17,7 @@ env:
   RUNTIME_SA: "nofoodwaste-backend-sa@my-first-project-9510f.iam.gserviceaccount.com"
   DEPLOYER_SA: "github-actions-deployer@my-first-project-9510f.iam.gserviceaccount.com"
   WIF_PROVIDER: "projects/301426404374/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   # ==========================================
