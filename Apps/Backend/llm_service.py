@@ -2,6 +2,7 @@ import os
 import json
 import time
 from datetime import datetime, timezone
+from pydantic import ValidationError
 from models import RecipeResponse
 from google.adk.agents import Agent
 from google.adk.runners import InMemoryRunner
@@ -62,75 +63,92 @@ async def generate_recipes(ingredients: list[dict]) -> RecipeResponse:
     )
     
     start_time = time.perf_counter()
-    duration = 0.0
+    max_retries = 3  # N=3 Versuche zur Selbstkorrektur (insgesamt max. 4 Durchläufe)
+    current_attempt = 0
+    current_prompt = prompt_user
     
     # 2. Run the agent using InMemoryRunner context manager
     async with InMemoryRunner(agent=cook_agent, app_name="FoodWasteCook") as runner:
-        try:
-            events = await runner.run_debug(prompt_user)
-            duration = time.perf_counter() - start_time
-            
-            # === Strategie 1: Detailliertes ADK-Event-Tracing in der Konsole ===
-            print(f"\n📢 [ADK 2.0] Koch-Agent gestartet - {len(events)} Events empfangen:")
-            for idx, event in enumerate(events):
-                author = getattr(event, "author", "system/unknown")
-                is_final = event.is_final_response()
-                print(f"  🔹 [Event {idx+1}/{len(events)}] Quelle: '{author}' | Final: {is_final}")
+        while current_attempt <= max_retries:
+            try:
+                print(f"\n📢 [ADK 2.0] Durchlauf {current_attempt + 1} gestartet (max. {max_retries + 1} Versuche)...")
+                events = await runner.run_debug(current_prompt)
                 
-                if event.content and event.content.parts:
-                    for p_idx, part in enumerate(event.content.parts):
-                        if hasattr(part, "text") and part.text:
-                            text_preview = part.text.strip().replace('\n', ' ')
-                            if len(text_preview) > 100:
-                                text_preview = text_preview[:100] + "..."
-                            print(f"    ▪️ Part {p_idx+1} (Text): {text_preview}")
-                        elif hasattr(part, "function_call") and part.function_call:
-                            print(f"    ▪️ Part {p_idx+1} [TOOL CALL]: {part.function_call.name} (Args: {part.function_call.args})")
-                        elif hasattr(part, "function_response") and part.function_response:
-                            print(f"    ▪️ Part {p_idx+1} [TOOL RESPONSE]: {part.function_response.name}")
-            print("📢 [ADK 2.0] Tracing beendet.\n")
-            
-            # 3. Extract the final response conforming to RecipeResponse
-            final_text = ""
-            for event in reversed(events):
-                if event.is_final_response() and event.content and event.content.parts:
-                    for part in event.content.parts:
-                        if part.text:
-                            final_text = part.text
+                # === Strategie 1: Detailliertes ADK-Event-Tracing in der Konsole ===
+                print(f"📢 [ADK 2.0] Koch-Agent beendet - {len(events)} Events empfangen:")
+                for idx, event in enumerate(events):
+                    author = getattr(event, "author", "system/unknown")
+                    is_final = event.is_final_response()
+                    print(f"  🔹 [Event {idx+1}/{len(events)}] Quelle: '{author}' | Final: {is_final}")
+                    
+                    if event.content and event.content.parts:
+                        for p_idx, part in enumerate(event.content.parts):
+                            if hasattr(part, "text") and part.text:
+                                text_preview = part.text.strip().replace('\n', ' ')
+                                if len(text_preview) > 100:
+                                    text_preview = text_preview[:100] + "..."
+                                print(f"    ▪️ Part {p_idx+1} (Text): {text_preview}")
+                            elif hasattr(part, "function_call") and part.function_call:
+                                print(f"    ▪️ Part {p_idx+1} [TOOL CALL]: {part.function_call.name} (Args: {part.function_call.args})")
+                            elif hasattr(part, "function_response") and part.function_response:
+                                print(f"    ▪️ Part {p_idx+1} [TOOL RESPONSE]: {part.function_response.name}")
+                print("📢 [ADK 2.0] Tracing beendet.\n")
+                
+                # 3. Extract the final response conforming to RecipeResponse
+                final_text = ""
+                for event in reversed(events):
+                    if event.is_final_response() and event.content and event.content.parts:
+                        for part in event.content.parts:
+                            if part.text:
+                                final_text = part.text
+                                break
+                        if final_text:
                             break
-                    if final_text:
-                        break
-            
-            if not final_text:
-                raise Exception("No response received from Cook Agent.")
                 
-            # Parse the structured JSON response into our Pydantic model
-            recipe_response = RecipeResponse.model_validate_json(final_text)
-            
-            # Normalize matchScore for each recipe
-            for recipe in recipe_response.recipes:
-                if recipe.matchScore > 1.0:
-                    recipe.matchScore = recipe.matchScore / 100.0
-                recipe.matchScore = min(max(recipe.matchScore, 0.0), 1.0)
+                if not final_text:
+                    raise ValueError("No response received from Cook Agent.")
                 
-            # Strategie 2: Erfolgreichen Durchlauf auditieren
-            recipes_list = []
-            for recipe in recipe_response.recipes:
-                recipes_list.append({
-                    "title": recipe.title,
-                    "matchScore": recipe.matchScore,
-                    "foodWastePriorityReason": recipe.foodWastePriorityReason
-                })
-            log_agent_run_to_audit_file(ingredients, recipes_list, duration, True)
-            
-            return recipe_response
-            
-        except Exception as error:
-            duration = time.perf_counter() - start_time
-            # Strategie 2: Fehlerhaften Durchlauf auditieren
-            log_agent_run_to_audit_file(ingredients, None, duration, False, str(error))
-            
-            print(f"Validation or Agent execution failed: {error}")
-            raise Exception(f"Failed to execute and validate agent recipe response: {str(error)}")
+                # Parse the structured JSON response into our Pydantic model
+                recipe_response = RecipeResponse.model_validate_json(final_text)
+                
+                # Normalize matchScore for each recipe
+                for recipe in recipe_response.recipes:
+                    if recipe.matchScore > 1.0:
+                        recipe.matchScore = recipe.matchScore / 100.0
+                    recipe.matchScore = min(max(recipe.matchScore, 0.0), 1.0)
+                
+                # Erfolgreichen Durchlauf auditieren
+                duration = time.perf_counter() - start_time
+                recipes_list = []
+                for recipe in recipe_response.recipes:
+                    recipes_list.append({
+                        "title": recipe.title,
+                        "matchScore": recipe.matchScore,
+                        "foodWastePriorityReason": recipe.foodWastePriorityReason
+                    })
+                log_agent_run_to_audit_file(ingredients, recipes_list, duration, True)
+                
+                print(f"✅ [ADK 2.0] Erfolgreiche Generierung und Validierung im Durchlauf {current_attempt + 1}!")
+                return recipe_response
+                
+            except (ValidationError, json.JSONDecodeError, ValueError, Exception) as error:
+                current_attempt += 1
+                duration = time.perf_counter() - start_time
+                
+                print(f"⚠️ [ADK 2.0] Validierungsfehler in Durchlauf {current_attempt}: {str(error)}")
+                
+                if current_attempt > max_retries:
+                    # Keine Retries mehr übrig -> Fehler loggen und abbrechen
+                    log_agent_run_to_audit_file(ingredients, None, duration, False, f"Fehlgeschlagen nach {current_attempt} Versuchen. Letzter Fehler: {str(error)}")
+                    print(f"Validation or Agent execution failed permanently: {error}")
+                    raise Exception(f"Failed to execute and validate agent recipe response after {max_retries + 1} attempts: {str(error)}")
+                
+                # Feedback-Prompt für die Korrekturschleife erstellen
+                current_prompt = (
+                    f"Deine vorherige Antwort hat die Pydantic-Validierung nicht bestanden und war fehlerhaft.\n\n"
+                    f"❌ VALIDIERUNGSFEHLER:\n{str(error)}\n\n"
+                    f"Bitte analysiere den Fehler, korrigiere deine Generierung und antworte erneut strictly "
+                    f"im geforderten JSON-Format (RecipeResponse Schema)."
+                )
 
 
