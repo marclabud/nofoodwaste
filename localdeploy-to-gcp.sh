@@ -98,6 +98,7 @@ read -p "Select choice (1, 2, or 3): " -n 1 -r REPLY_FRONTEND
 echo ""
 
 # Validate choice and dependencies early before making changes on GCP
+INITIAL_ALLOWED_ORIGINS="*"
 if [[ $REPLY_FRONTEND == "1" ]]; then
     echo -e "${BLUE}Checking dependencies for Firebase Hosting...${NC}"
     if ! command -v node &> /dev/null; then
@@ -111,6 +112,7 @@ if [[ $REPLY_FRONTEND == "1" ]]; then
         exit 1
     fi
     echo -e "${GREEN}[✔] Node.js and pnpm are installed.${NC}"
+    INITIAL_ALLOWED_ORIGINS="https://$PROJECT_ID.web.app,https://$PROJECT_ID.firebaseapp.com"
 elif [[ $REPLY_FRONTEND == "2" ]]; then
     echo -e "${GREEN}[✔] Container engine ($CONTAINER_CMD) will build and run the frontend container.${NC}"
 fi
@@ -210,7 +212,7 @@ gcloud run deploy nofoodwaste-backend \
     --service-account="$SA_EMAIL" \
     --allow-unauthenticated \
     --max-instances=2 \
-    --set-env-vars="DB_PROVIDER=firestore,ENVIRONMENT=production,ALLOWED_ORIGINS=*" \
+    --set-env-vars="^|^DB_PROVIDER=firestore|ENVIRONMENT=production|ALLOWED_ORIGINS=$INITIAL_ALLOWED_ORIGINS" \
     --set-secrets="GEMINI_API_KEY=gemini-api-key:latest" \
     --port=8000 --quiet
 
@@ -273,18 +275,6 @@ EOF
     npx firebase-tools deploy --only hosting --project "$PROJECT_ID"
     cd ../..
     echo -e "${GREEN}[✔] Frontend successfully deployed to Firebase Hosting!${NC}"
-    
-    # Secure CORS configuration: Update backend env vars with the actual Firebase domains
-    echo -e "\n${BLUE}Restricting Backend CORS ALLOWED_ORIGINS to Firebase Hosting domains...${NC}"
-    FRONTEND_URL="https://$PROJECT_ID.web.app,https://$PROJECT_ID.firebaseapp.com"
-    echo -e "Target Origins: ${YELLOW}$FRONTEND_URL${NC}"
-    if gcloud run services update nofoodwaste-backend \
-        --region="$REGION" \
-        --update-env-vars="^|^ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
-        echo -e "${GREEN}[✔] Backend CORS successfully restricted to production domains.${NC}"
-    else
-        echo -e "${RED}[✘] Warning: Failed to update Backend CORS settings. ALLOWED_ORIGINS remains '*'.${NC}"
-    fi
     
 elif [[ $REPLY_FRONTEND == "2" ]]; then
     FRONTEND_IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/frontend:latest"
