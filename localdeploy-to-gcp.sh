@@ -88,6 +88,33 @@ echo -e "Region:           ${YELLOW}$REGION${NC}"
 echo -e "Container Runner: ${YELLOW}$CONTAINER_CMD${NC}"
 echo -e "Secret Key:       ${YELLOW}**** (Loaded)${NC}"
 echo -e "${BLUE}---------------------------------${NC}"
+
+echo -e "\n${BLUE}--- Frontend Deployment Option ---${NC}"
+echo -e "How would you like to deploy the Frontend?"
+echo -e "  [1] Firebase Hosting (Recommended, Static CDN, 100% Free)"
+echo -e "  [2] Google Cloud Run (Containerized Nginx on Cloud Run)"
+echo -e "  [3] Skip Frontend Deployment for now"
+read -p "Select choice (1, 2, or 3): " -n 1 -r REPLY_FRONTEND
+echo ""
+
+# Validate choice and dependencies early before making changes on GCP
+if [[ $REPLY_FRONTEND == "1" ]]; then
+    echo -e "${BLUE}Checking dependencies for Firebase Hosting...${NC}"
+    if ! command -v node &> /dev/null; then
+        echo -e "${RED}[✘] Error: Node.js (node/npm) is not installed. It is required for Firebase Hosting deployment.${NC}"
+        echo -e "    Please install Node.js (https://nodejs.org) and try again."
+        exit 1
+    fi
+    if ! command -v pnpm &> /dev/null; then
+        echo -e "${RED}[✘] Error: pnpm is not installed. It is required for generating the static Nuxt frontend.${NC}"
+        echo -e "    Please install pnpm: npm install -g pnpm"
+        exit 1
+    fi
+    echo -e "${GREEN}[✔] Node.js and pnpm are installed.${NC}"
+elif [[ $REPLY_FRONTEND == "2" ]]; then
+    echo -e "${GREEN}[✔] Container engine ($CONTAINER_CMD) will build and run the frontend container.${NC}"
+fi
+
 read -p "Do you want to proceed with the deployment? (y/n) " -n 1 -r
 echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -195,12 +222,6 @@ echo -e "${GREEN}[✔] Backend deployed successfully at: ${YELLOW}$BACKEND_URL${
 # STEP 8: Deploy Frontend Options
 # ====================================================
 echo -e "\n${BLUE}[Step 8/8] Frontend Deployment...${NC}"
-echo -e "How would you like to deploy the Frontend?"
-echo -e "  [1] Firebase Hosting (Recommended, Static CDN, 100% Free)"
-echo -e "  [2] Google Cloud Run (Containerized Nginx on Cloud Run)"
-echo -e "  [3] Skip Frontend Deployment for now"
-read -p "Select choice (1, 2, or 3): " -n 1 -r REPLY_FRONTEND
-echo ""
 
 if [[ $REPLY_FRONTEND == "1" ]]; then
     echo -e "${BLUE}Deploying Frontend to Firebase Hosting...${NC}"

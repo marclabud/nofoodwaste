@@ -29,6 +29,20 @@ echo -e "Backend:     ${YELLOW}$BACKEND_SERVICE${NC}"
 echo -e "Region:      ${YELLOW}$REGION${NC}"
 echo -e "----------------------------------------------------"
 
+# Prüfe lokale Abhängigkeiten frühzeitig (da Firebase Hosting pnpm und node benötigt)
+echo -e "\n${BLUE}Prüfe lokale Abhängigkeiten...${NC}"
+if ! command -v node &> /dev/null; then
+    echo -e "${RED}[✘] Fehler: Node.js (node/npm) ist nicht installiert.${NC}"
+    echo -e "    Bitte installiere Node.js (https://nodejs.org) und versuche es erneut."
+    exit 1
+fi
+if ! command -v pnpm &> /dev/null; then
+    echo -e "${RED}[✘] Fehler: pnpm ist nicht installiert.${NC}"
+    echo -e "    Bitte installiere pnpm (npm install -g pnpm) und versuche es erneut."
+    exit 1
+fi
+echo -e "${GREEN}[✔] Node.js und pnpm sind vorhanden.${NC}"
+
 # 1. Backend wieder freigeben
 echo -e "\n${BLUE}[1/2] Gebe Backend-Zugriff auf Cloud Run frei...${NC}"
 if gcloud run services add-iam-policy-binding "$BACKEND_SERVICE" \

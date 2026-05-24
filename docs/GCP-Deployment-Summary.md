@@ -45,7 +45,7 @@ If you need to deploy this project or a similar service to a brand-new Google Cl
 ```mermaid
 graph TD
     A[1. Setup Project & Billing in Console] --> B[2. Enable Firebase Hosting]
-    B --> C[3. Run bash ./deploy-to-gcp.sh]
+    B --> C[3. Run bash ./localdeploy-to-gcp.sh]
     C --> D[4. Done! App is Live]
 ```
 
@@ -70,7 +70,7 @@ graph TD
     ```
 3.  Run the automated deployment script:
     ```bash
-    bash ./deploy-to-gcp.sh
+    bash ./localdeploy-to-gcp.sh
     ```
 4.  Type `y` to confirm, and select `1` for Firebase Hosting when prompted at the end.
 
