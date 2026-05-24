@@ -67,6 +67,8 @@ jobs:
             DB_PROVIDER=firestore
             ENVIRONMENT=production
             ALLOWED_ORIGINS=https://my-first-project-9510f.web.app,https://my-first-project-9510f.firebaseapp.com
+          secrets: |
+            GEMINI_API_KEY=gemini-api-key:latest
 
   # ==========================================
   # JOB 2: Nuxt Frontend nach Firebase Hosting deployen
