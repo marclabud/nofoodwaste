@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+# Exit immediately if any command fails, treat unset variables as an error, and catch pipeline failures
+set -euo pipefail
 
 # Color definitions
 RED='\033[0;31m'

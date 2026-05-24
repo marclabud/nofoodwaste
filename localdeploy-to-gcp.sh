@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+# Exit immediately if any command fails, treat unset variables as an error, and catch pipeline failures
+set -euo pipefail
 
 # Color definitions
 RED='\033[0;31m'
@@ -70,8 +70,8 @@ echo -e "${GREEN}[✔] Target Region: $REGION (Zurich, Switzerland)${NC}"
 ENV_FILE="./Apps/Backend/.env"
 GEMINI_API_KEY=""
 if [ -f "$ENV_FILE" ]; then
-    # Extracts value for GEMINI_API_KEY from the local environment file
-    GEMINI_API_KEY=$(grep -E "^GEMINI_API_KEY=" "$ENV_FILE" | cut -d'=' -f2-)
+    # Extracts value for GEMINI_API_KEY from the local environment file (wrapped to avoid pipefail crash if unset)
+    GEMINI_API_KEY=$( (grep -E "^GEMINI_API_KEY=" "$ENV_FILE" || true) | cut -d'=' -f2-)
 fi
 
 if [ -z "$GEMINI_API_KEY" ] || [[ "$GEMINI_API_KEY" == *"api_key_hier"* ]]; then
