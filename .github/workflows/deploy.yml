@@ -62,7 +62,7 @@ jobs:
           service: ${{ env.BACKEND_SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.IMAGE_TAG }}
-          service_account: ${{ env.RUNTIME_SA }}
+          flags: --service-account=${{ env.RUNTIME_SA }}
           env_vars: |
             DB_PROVIDER=firestore
             ENVIRONMENT=production
