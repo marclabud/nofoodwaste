@@ -268,8 +268,6 @@ EOF
     pnpm install --no-frozen-lockfile
     pnpm run generate
     
-    echo -e "${BLUE}Ensuring Firebase Hosting site is created...${NC}"
-    npx firebase-tools hosting:sites:create "$PROJECT_ID" --project "$PROJECT_ID" || true
 
     echo -e "${BLUE}Deploying via Firebase CLI...${NC}"
     npx firebase-tools deploy --only hosting --project "$PROJECT_ID"
@@ -282,7 +280,7 @@ EOF
     echo -e "Target Origins: ${YELLOW}$FRONTEND_URL${NC}"
     if gcloud run services update nofoodwaste-backend \
         --region="$REGION" \
-        --update-env-vars="ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
+        --update-env-vars="^|^ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
         echo -e "${GREEN}[✔] Backend CORS successfully restricted to production domains.${NC}"
     else
         echo -e "${RED}[✘] Warning: Failed to update Backend CORS settings. ALLOWED_ORIGINS remains '*'.${NC}"
@@ -315,7 +313,7 @@ elif [[ $REPLY_FRONTEND == "2" ]]; then
     echo -e "Target Origin: ${YELLOW}$FRONTEND_URL${NC}"
     if gcloud run services update nofoodwaste-backend \
         --region="$REGION" \
-        --update-env-vars="ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
+        --update-env-vars="^|^ALLOWED_ORIGINS=$FRONTEND_URL" --quiet; then
         echo -e "${GREEN}[✔] Backend CORS successfully restricted to production domains.${NC}"
     else
         echo -e "${RED}[✘] Warning: Failed to update Backend CORS settings. ALLOWED_ORIGINS remains '*'.${NC}"
@@ -323,8 +321,8 @@ elif [[ $REPLY_FRONTEND == "2" ]]; then
 else
     echo -e "${YELLOW}Skipped Frontend Deployment. You can deploy it manually later!${NC}"
     echo -e "${YELLOW}[!] Note: Backend ALLOWED_ORIGINS is currently set to '*' (open to all).${NC}"
-    echo -e "${YELLOW}    Once deployed, update it securely using:${NC}"
-    echo -e "${YELLOW}    gcloud run services update nofoodwaste-backend --region=\"$REGION\" --update-env-vars=\"ALLOWED_ORIGINS=https://[your-frontend-url]\"${NC}"
+    echo -e "${YELLOW}    Once deployed, update it securely using (escaping commas with ^|^ if multiple URLs are provided):${NC}"
+    echo -e "${YELLOW}    gcloud run services update nofoodwaste-backend --region=\"$REGION\" --update-env-vars=\"^|^ALLOWED_ORIGINS=https://[your-frontend-url]\"${NC}"
 fi
 
 echo -e "\n${GREEN}====================================================${NC}"
