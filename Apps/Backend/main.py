@@ -74,7 +74,7 @@ def update_ingredient(ingredient_id: str, ingredient_in: IngredientCreate):
     
     return db_provider.update_ingredient(ingredient_id, ingredient_in, created_at)
 
-from llm_service import generate_recipes
+from agent_service import generate_recipes
 from models import RecipeResponse, GenerateRecipeRequest
 
 @app.post("/recipes/generate", response_model=RecipeResponse)

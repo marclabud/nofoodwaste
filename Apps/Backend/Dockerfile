@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source code
-COPY main.py database.py models.py llm_service.py ./
+COPY main.py database.py models.py llm_service.py agent_service.py ./
 COPY prompts/ ./prompts/
 
 # Expose FastAPI port

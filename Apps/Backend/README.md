@@ -10,7 +10,8 @@ The backend comprises the following core components:
 *   **`main.py`**: The main entry point of the FastAPI application. It configures CORS for the frontend (`http://localhost:3000`), CRUD endpoints for ingredients (`/ingredients`), and the recipe generation endpoint (`/recipes/generate`).
 *   **`database.py`**: Manages the SQLite database (`food_waste.db`). The `ingredients` table is automatically created on startup if it does not exist.
 *   **`models.py`**: Pydantic data schemas for validating API requests and responses.
-*   **`llm_service.py`**: Integrates the Google ADK 2.0. It defines the `cook_agent` which generates structured recipes using the system prompt located in `prompts/system_recipe_assistant.md`.
+*   **`llm_service.py`**: Acts as the LLM connection service, exposing `LLMProvider` to manage LLM configurations, validate model options, and map choice constants to concrete model names.
+*   **`agent_service.py`**: Integrates the Google ADK 2.0. It defines the `cook_agent` which generates structured recipes using the system prompt located in `prompts/system_recipe_assistant.md`, maps selected LLMs via constants, handles execution auditing, and exposes `generate_recipes` for FastAPI.
 *   **`requirements.txt`**: Defines python dependencies (FastAPI, Uvicorn, Pydantic, python-dotenv, google-adk).
 *   **`.python-version`**: Specifies the target Python version (`3.13.11`).
 
