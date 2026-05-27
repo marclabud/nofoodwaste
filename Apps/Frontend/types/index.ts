@@ -1,26 +1,6 @@
-export interface Ingredient {
-  id: string
-  name: string
-  quantity: number
-  unit: "g" | "kg" | "ml" | "l" | "piece"
-  expiresAt: string
-  createdAt: string
-}
+import type { components } from './openapi'
 
-export type CreateIngredient = Omit<Ingredient, "id" | "createdAt">
-
-export interface Recipe {
-  title: string
-  matchScore: number
-  foodWastePriorityReason: string
-  estimatedTimeMinutes: number
-  usedIngredients: string[]
-  missingRequiredIngredients: string[]
-  optionalIngredients: string[]
-  steps: string[]
-  explanation: string
-}
-
-export interface RecipeResponse {
-  recipes: Recipe[]
-}
+export type Ingredient = components['schemas']['Ingredient']
+export type CreateIngredient = components['schemas']['IngredientCreate']
+export type Recipe = components['schemas']['Recipe']
+export type RecipeResponse = components['schemas']['RecipeResponse']
