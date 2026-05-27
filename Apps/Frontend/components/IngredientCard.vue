@@ -124,7 +124,7 @@ const formatUnit = (unitStr: string) => {
       <div class="flex flex-col gap-3">
         <div>
           <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1">Name</label>
-          <input v-model="editName" type="text" class="w-full bg-background border border-border rounded-xl p-2 text-text text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-250" />
+          <input v-model="editName" type="text" maxlength="50" class="w-full bg-background border border-border rounded-xl p-2 text-text text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-250" />
         </div>
         <div class="flex gap-3">
           <div class="flex-1">

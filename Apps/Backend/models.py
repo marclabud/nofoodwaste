@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Literal
 
 class IngredientBase(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=100)
     quantity: float
     unit: Literal["g", "kg", "ml", "l", "piece"]
     expiresAt: str  # YYYY-MM-DD

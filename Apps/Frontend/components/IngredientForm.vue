@@ -47,7 +47,7 @@ const submit = async () => {
     <form @submit.prevent="submit" class="flex flex-col gap-4">
       <div>
         <label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Name</label>
-        <input v-model="name" type="text" required class="w-full bg-background border border-border rounded-xl p-2.5 text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-250 text-sm" placeholder="z.B. Tomaten" />
+        <input v-model="name" type="text" required maxlength="50" class="w-full bg-background border border-border rounded-xl p-2.5 text-text focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-250 text-sm" placeholder="z.B. Tomaten" />
       </div>
       
       <div class="flex gap-4">
