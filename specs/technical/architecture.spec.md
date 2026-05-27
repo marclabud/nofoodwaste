@@ -16,7 +16,7 @@ Das System ist in ein dediziertes Frontend und Backend getrennt, organisiert in 
     - **Agentengestützte KI-Integration:** Utilizes **Google ADK (Agent Development Kit) 2.0** with **Gemini 2.5 Flash** (via `LLM_MODEL`). 
       - Der Rezept-Agent (`cook_agent`) läuft gekapselt im `InMemoryRunner`.
       - **Structured Outputs:** Pydantic-Modelle erzwingen standardisierte JSON-Antworten direkt auf Provider-Ebene.
-      - **Robustness Layer:** Lokales Python-Post-Processing (in `llm_service.py`) zur Normalisierung ungenauer Modellwerte (z. B. `matchScore` Begrenzung auf `[0.0, 1.0]`).
+      - **Robustness Layer:** Lokales Python-Post-Processing (in `agent_service.py`) zur Normalisierung ungenauer Modellwerte (z. B. `matchScore` Begrenzung auf `[0.0, 1.0]`).
 - **Package Manager:** `pnpm` (Workspace setup)
 
 ## Speicherung (Datenbank)

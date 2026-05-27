@@ -164,7 +164,7 @@ Before executing database modifications or invoking the AI Agent, the backend pe
 ---
 
 ### 2. Response Normalization & Validation (Post-Processing)
-Nachdem der ADK-Agent die Antwort von Gemini empfangen und geparst hat, greift die Python-seitige Bereinigungsebene in `llm_service.py`:
+Nachdem der ADK-Agent die Antwort von Gemini empfangen und geparst hat, greift die Python-seitige Bereinigungsebene in `agent_service.py`:
 
 * **Structured Outputs:** Gemini 2.5 Flash wird durch das native OpenAPI-JSON-Schema von Pydantic (`RecipeResponse`) gezwungen, eine perfekt geformte JSON-Struktur auszugeben. 
 * **Match-Score Normalisierung (Robustness Layer):**

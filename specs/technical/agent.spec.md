@@ -7,9 +7,9 @@ This specification defines the technical implementation, architecture, and behav
 ## 🏗️ Architecture & Framework
 The agent is implemented using **Google ADK (Agent Development Kit) 2.0** as an autonomous, encapsulated software block.
 
-* **Core Engine:** **Gemini 2.5 Flash** (configurable via environment variable `LLM_MODEL`).
+* **Core Engine:** **Gemini 2.5 Flash** (configurable via environment variable `LLM_MODEL`, resolved by `llm_service.py`).
 * **Framework:** `google.adk.agents.Agent`
-* **Execution Context:** `google.adk.runners.InMemoryRunner`
+* **Execution Context:** `google.adk.runners.InMemoryRunner` (inside `agent_service.py`)
 * **Structured Input/Output:** Pydantic validation (`pydantic>=2.7.0`) via the `RecipeResponse` schema.
 
 ```text
@@ -19,7 +19,7 @@ FastAPI Endpunkt (main.py)
 Zutaten-Filtern (MHD-Verfallprüfung)
       │
       ▼
-LLM-Service (llm_service.py) 
+Agent-Service (agent_service.py) [Resolves model via llm_service.py]
  └── [InMemoryRunner]
       └── [cook_agent] (Google ADK 2.0)
             ├── Prompts (system_recipe_assistant.md)
@@ -29,7 +29,7 @@ LLM-Service (llm_service.py)
             [Gemini 2.5 Flash] ──► Generiert structured JSON
                   │
                   ▼
-Daten-Normalisierung (Local Post-Processing in Python)
+Daten-Normalisierung (Local Post-Processing in agent_service.py)
       │ (Dividiert matchScore / 100 falls > 1.0, klammert auf [0.0, 1.0])
       ▼
 Valides JSON-Response an Nuxt-Frontend
@@ -39,13 +39,13 @@ Valides JSON-Response an Nuxt-Frontend
 
 ## ⚙️ Agent Configuration
 
-The agent is instantiated programmatically inside [llm_service.py](file:///Users/hector/dev/NoFoodWaste/Apps/Backend/llm_service.py) with the following attributes:
+The agent is instantiated programmatically inside [agent_service.py](file:///Users/hector/dev/NoFoodWaste/Apps/Backend/agent_service.py) with the following attributes:
 
 ```python
 cook_agent = Agent(
     name="cook_agent",
-    model=model_name,              # e.g., "gemini-2.5-flash"
-    instruction=system_prompt,     # Loaded from system_recipe_assistant.md
+    model=model_name,              # e.g., "gemini-2.5-flash" (resolved via llm_provider)
+    instruction=load_system_prompt(), # Loaded from system_recipe_assistant.md
     output_schema=RecipeResponse,  # Pydantic model for Structured Outputs
     output_key="recipe_response"
 )
@@ -122,7 +122,7 @@ To protect the backend from abuse, prompt injection, or jailbreaks, the followin
 ---
 
 ## 🛠️ Local Post-Processing & Normalization (Robustness Layer)
-Since Large Language Models (LLMs) can occasionally return the `matchScore` as an integer percentage (e.g., `95.0` or `95` for 95%) rather than a decimal float (e.g., `0.95`), the backend executes a local post-processing step in `llm_service.py` directly after parsing the JSON response:
+Since Large Language Models (LLMs) can occasionally return the `matchScore` as an integer percentage (e.g., `95.0` or `95` for 95%) rather than a decimal float (e.g., `0.95`), the backend executes a local post-processing step in `agent_service.py` directly after parsing the JSON response:
 
 ```python
 # Extract and parse response
@@ -140,3 +140,4 @@ for recipe in recipe_response.recipes:
 This guarantees that:
 1. Pydantic schema consistency is maintained.
 2. The Nuxt 4 frontend can safely render the score using `Math.round(recipe.matchScore * 100)` to display exactly **`95% Match`** (instead of `9500%`).
+

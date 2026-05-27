@@ -19,6 +19,7 @@ NoFoodWaste/dist/
 │   ├── database.py
 │   ├── models.py
 │   ├── llm_service.py
+│   ├── agent_service.py
 │   ├── prompts/
 │   │   └── system_recipe_assistant.md
 │   └── requirements.txt
@@ -61,7 +62,7 @@ Das Backend wird für die Produktion verpackt. Lokale SQLite-Datenbankdateien (`
 1. **Dateien kopieren:**
    ```bash
    cd ../Backend
-   cp -R main.py database.py models.py llm_service.py requirements.txt ../../dist/backend/
+   cp -R main.py database.py models.py llm_service.py agent_service.py requirements.txt ../../dist/backend/
    cp -R prompts/ ../../dist/backend/prompts/
    ```
 
